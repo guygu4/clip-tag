@@ -1,6 +1,9 @@
 import { useRef, useEffect } from "react";
 
-const VIDEO_SRC = import.meta.env.VITE_VIDEO_URL || "/bang.mp4";
+// Use VITE_VIDEO_URL (online link). No local fallback – local videos are gitignored.
+const VIDEO_SRC =
+  import.meta.env.VITE_VIDEO_URL ||
+  "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
 
 export default function VideoPlayer({ onTimeUpdate, videoRef: externalRef }) {
   const internalRef = useRef(null);

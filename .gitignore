@@ -24,5 +24,7 @@ Thumbs.db
 # Prisma
 backend/prisma/migrations/**/migration_lock.toml
 
-# Large files
-frontend/public/bang.mp4
+# Local video files (use VITE_VIDEO_URL for an online video instead)
+frontend/public/*.mp4
+frontend/public/*.webm
+frontend/public/*.mov

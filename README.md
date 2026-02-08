@@ -26,7 +26,7 @@ See [PLAN.md](./PLAN.md) for architecture and deployment.
    - Your app is at `https://<your-service-name>.onrender.com`. Send this to participants.
    - For pre-assigned IDs: `https://<your-service-name>.onrender.com?study=exp1&participant=p001`.
 
-**Video on Render:** Put your clip in `frontend/public/` (e.g. `bang.mp4`) and reference it in the app, or set `VITE_VIDEO_URL` in the Render service **Environment** to a full URL. Rebuild after changing env.
+**Video:** Set `VITE_VIDEO_URL` in the Render service **Environment** to an online video URL (local files in `frontend/public/` are gitignored). Rebuild after changing env.
 
 ---
 
@@ -54,7 +54,7 @@ The app uses **PostgreSQL**. For local dev use a free [Neon](https://neon.tech) 
    ```
    App runs at `http://localhost:5173` and proxies `/api` to the backend.
 
-4. **Video**: Put a video file in `frontend/public/` (e.g. `bang.mp4`) or set `VITE_VIDEO_URL` in `frontend/.env`.
+4. **Video**: Set `VITE_VIDEO_URL` in `frontend/.env` to an online video URL (see `frontend/.env.example`). Local videos in `frontend/public/` are gitignored to keep the repo small.
 
 5. Open `http://localhost:5173`. Optional: `?study=exp1&participant=p001` for link-based participant IDs.
 
