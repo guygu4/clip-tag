@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Build output
+frontend/dist/
+backend/build/
+
+# SQLite (local dev)
+backend/data/*.db
+backend/data/*.db-journal
+
+# IDE / OS
+.idea/
+.vscode/
+*.log
+.DS_Store
+Thumbs.db
+
+# Prisma
+backend/prisma/migrations/**/migration_lock.toml

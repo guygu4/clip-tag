@@ -1,0 +1,31 @@
+// PostgreSQL (Render, Neon, etc.). Use DATABASE_URL in .env.
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Session {
+  id              String   @id @default(uuid())
+  userId          String   @map("user_id")
+  clipStartTime   String   @map("clip_start_time")
+  studyId         String?  @map("study_id")
+  participantId   String?  @map("participant_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+  events          Event[]
+
+  @@map("sessions")
+}
+
+model Event {
+  id          String   @id @default(uuid())
+  sessionId   String   @map("session_id")
+  timeSeconds Float    @map("time_seconds")
+  createdAt   DateTime @default(now()) @map("created_at")
+  session     Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("events")
+}

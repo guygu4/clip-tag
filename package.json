@@ -1,0 +1,12 @@
+{
+  "name": "clip-tag",
+  "private": true,
+  "description": "Browser-based event tagging on video clips",
+  "scripts": {
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build:frontend": "cd frontend && npm run build",
+    "build:backend": "cd backend && npm run build",
+    "postinstall": "cd backend && npm install && cd ../frontend && npm install"
+  }
+}
