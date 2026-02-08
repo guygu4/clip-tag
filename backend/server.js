@@ -1,6 +1,7 @@
 import "dotenv/config";
 import path from "path";
 import { fileURLToPath } from "url";
+import { Readable } from "stream";
 import express from "express";
 import cors from "cors";
 import { PrismaClient } from "@prisma/client";
@@ -94,6 +95,75 @@ app.get("/api/sessions/:id/events", async (req, res) => {
   } catch (err) {
     console.error("GET /api/sessions/:id/events", err);
     return res.status(500).json({ error: "Failed to list events" });
+  }
+});
+
+// GET /api/video – stream video from VIDEO_SOURCE_URL (Bunny, Drive, or any URL)
+function getVideoSourceUrl() {
+  const url = process.env.VIDEO_SOURCE_URL || "";
+  if (!url.trim()) return null;
+  const u = url.trim();
+  const driveMatch =
+    u.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/) ||
+    u.match(/drive\.google\.com\/open\?id=([a-zA-Z0-9_-]+)/);
+  if (driveMatch) {
+    const id = driveMatch[1];
+    return `https://drive.google.com/uc?export=view&id=${id}`;
+  }
+  return u;
+}
+
+app.get("/api/video", async (req, res) => {
+  const sourceUrl = getVideoSourceUrl();
+  if (!sourceUrl) {
+    return res.status(503).json({ error: "VIDEO_SOURCE_URL is not set on the server" });
+  }
+  try {
+    const range = req.get("range");
+    const opts = { redirect: "follow" };
+    const headers = {};
+    if (range) headers["Range"] = range;
+    const referer = process.env.VIDEO_SOURCE_REFERER || process.env.FRONTEND_ORIGIN || "";
+    if (referer) headers["Referer"] = referer;
+    if (Object.keys(headers).length) opts.headers = headers;
+    const resp = await fetch(sourceUrl, opts);
+    if (!resp.ok) {
+      console.error("GET /api/video: source returned", resp.status, sourceUrl.replace(/[?].*/, ""));
+      return res.status(resp.status).json({
+        error: `Video source returned ${resp.status}. For Bunny.net add your domain to Allowed Referrers, or set VIDEO_SOURCE_REFERER to your app URL.`,
+      });
+    }
+    const contentType = (resp.headers.get("content-type") || "").split(";")[0].trim();
+    if (contentType && contentType.toLowerCase().includes("text/html")) {
+      console.error("GET /api/video: source returned HTML, not video. Check VIDEO_SOURCE_URL is a direct video URL.");
+      return res.status(502).json({
+        error:
+          "Video source returned HTML (wrong URL or login page). Use a direct MP4 URL from Bunny.net, or check VIDEO_SOURCE_URL.",
+      });
+    }
+    res.setHeader("Content-Type", contentType || "video/mp4");
+    res.setHeader("Accept-Ranges", "bytes");
+    const cl = resp.headers.get("content-length");
+    if (cl) res.setHeader("Content-Length", cl);
+    if (resp.status === 206 && resp.headers.get("content-range")) {
+      res.status(206);
+      res.setHeader("Content-Range", resp.headers.get("content-range"));
+    }
+    if (resp.body) {
+      const stream = Readable.fromWeb(resp.body);
+      stream.on("error", (err) => console.error("GET /api/video stream error:", err.message));
+      stream.pipe(res);
+      return;
+    }
+    const buffer = await resp.arrayBuffer();
+    res.send(Buffer.from(buffer));
+  } catch (err) {
+    const msg = err.message || String(err);
+    console.error("GET /api/video:", msg, "URL:", sourceUrl.replace(/[?].*/, ""));
+    return res.status(502).json({
+      error: "Failed to load video",
+      detail: msg,
+    });
   }
 });
 

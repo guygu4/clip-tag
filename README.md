@@ -26,7 +26,21 @@ See [PLAN.md](./PLAN.md) for architecture and deployment.
    - Your app is at `https://<your-service-name>.onrender.com`. Send this to participants.
    - For pre-assigned IDs: `https://<your-service-name>.onrender.com?study=exp1&participant=p001`.
 
-**Video:** Set `VITE_VIDEO_URL` in the Render service **Environment** to an online video URL (local files in `frontend/public/` are gitignored). Rebuild after changing env.
+**Video:**  
+- **Bunny.net (direct):** Set `VITE_VIDEO_URL` to your Bunny **direct MP4** URL (see [Bunny: get direct MP4 URL](#bunnynet-get-the-direct-mp4-url) below). Add your domain to **Allowed Referrers** in the Bunny dashboard.  
+- **Bunny.net (proxy):** Set `VITE_VIDEO_URL=/api/video`, `VIDEO_SOURCE_URL` to the **direct MP4** URL (same as below), and optionally `VIDEO_SOURCE_REFERER` to your app URL.  
+- **Google Drive:** Set `VITE_VIDEO_URL=/api/video` and `VIDEO_SOURCE_URL` to your Drive share link.
+
+#### Bunny.net: get the direct MP4 URL
+
+If you see *"Video source returned HTML"*, the URL in `VIDEO_SOURCE_URL` (or `VITE_VIDEO_URL`) is not the video file.
+
+1. In **Bunny Stream** dashboard → your **Video Library** → **Encoding** tab → turn on **MP4 Fallback** and save. (Videos encoded after this will have MP4s.)
+2. Open the **video** → find the **MP4 URLs** section (or **Download** / resolutions). Copy a link that ends in **`.mp4`** (e.g. `play_720p.mp4`).
+3. The URL should look like:  
+   `https://vz-XXXXX.b-cdn.net/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX/play_720p.mp4`  
+   Use that full URL in `VIDEO_SOURCE_URL` (proxy) or `VITE_VIDEO_URL` (direct).  
+   Do **not** use the main “Stream URL” or any `.m3u8` (HLS) link—those return HTML or a manifest, not the video file.
 
 ---
 
@@ -54,7 +68,7 @@ The app uses **PostgreSQL**. For local dev use a free [Neon](https://neon.tech) 
    ```
    App runs at `http://localhost:5173` and proxies `/api` to the backend.
 
-4. **Video**: Set `VITE_VIDEO_URL` in `frontend/.env` to an online video URL (see `frontend/.env.example`). Local videos in `frontend/public/` are gitignored to keep the repo small.
+4. **Video**: Set `VITE_VIDEO_URL` in `frontend/.env` to a direct video URL (e.g. Bunny.net **direct MP4** URL), or use the proxy: `VITE_VIDEO_URL=/api/video` and `VIDEO_SOURCE_URL` in `backend/.env`. For Bunny direct playback, add `http://localhost:5173` to **Allowed Referrers** in the Bunny dashboard. Restart the frontend after changing `.env`.
 
 5. Open `http://localhost:5173`. Optional: `?study=exp1&participant=p001` for link-based participant IDs.
 

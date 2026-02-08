@@ -25,5 +25,10 @@ services:
         fromDatabase:
           name: cliptag-db
           property: connectionString
+      # Set in Render Dashboard. For direct video URL set VITE_VIDEO_URL; for Google Drive set VITE_VIDEO_URL=/api/video and VIDEO_SOURCE_URL to your Drive share link.
+      - key: VITE_VIDEO_URL
+        sync: false
+      - key: VIDEO_SOURCE_URL
+        sync: false
       # Set FRONTEND_ORIGIN in Render Dashboard to your service URL after first deploy (e.g. https://clip-tag-xxxx.onrender.com)
       # so CORS works if you ever use the API from another origin. Same-origin (this app) works without it.
