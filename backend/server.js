@@ -98,6 +98,18 @@ app.get("/api/sessions/:id/events", async (req, res) => {
   }
 });
 
+// DELETE /api/admin/clear – clear all sessions and events (admin only, front-end gated)
+app.delete("/api/admin/clear", async (_req, res) => {
+  try {
+    await prisma.event.deleteMany({});
+    await prisma.session.deleteMany({});
+    return res.status(204).end();
+  } catch (err) {
+    console.error("DELETE /api/admin/clear", err);
+    return res.status(500).json({ error: "Failed to clear database" });
+  }
+});
+
 // GET /api/video – stream video from VIDEO_SOURCE_URL (Bunny, Drive, or any URL)
 function getVideoSourceUrl() {
   const url = process.env.VIDEO_SOURCE_URL || "";

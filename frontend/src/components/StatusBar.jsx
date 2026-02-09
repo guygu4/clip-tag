@@ -7,6 +7,7 @@ export function formatTime(seconds) {
 
 export default function StatusBar({
   currentTime,
+  totalDuration,
   isPlaying,
   onPlay,
   onPause,
@@ -17,6 +18,9 @@ export default function StatusBar({
     <div className="status-bar">
       <span className="time" aria-label="Elapsed time">
         {formatTime(currentTime)}
+        {totalDuration != null && !Number.isNaN(totalDuration) && (
+          <> / {formatTime(totalDuration)}</>
+        )}
       </span>
       {isPlaying ? (
         <button type="button" className="btn-pause" onClick={onPause} aria-label="Pause">

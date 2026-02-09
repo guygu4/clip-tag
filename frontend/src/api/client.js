@@ -40,3 +40,13 @@ export async function addEvent(sessionId, timeSeconds) {
 export function getExportCsvUrl() {
   return `${getBaseUrl()}/api/export/csv`;
 }
+
+export async function clearDatabase() {
+  const res = await fetch(`${getBaseUrl()}/api/admin/clear`, {
+    method: "DELETE",
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: res.statusText }));
+    throw new Error(err.error || "Failed to clear database");
+  }
+}
