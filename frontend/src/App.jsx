@@ -19,6 +19,7 @@ export default function App() {
   const [events, setEvents] = useState([]);
   const [participantName, setParticipantName] = useState("");
   const [clipStartTime, setClipStartTime] = useState(null);
+  const [duration, setDuration] = useState(null);
   const [toast, setToast] = useState(null);
   const [error, setError] = useState(null);
   const [showIntro, setShowIntro] = useState(true);
@@ -187,9 +188,11 @@ export default function App() {
       <VideoPlayer
         videoRef={videoRef}
         onTimeUpdate={setCurrentTime}
+        onDurationChange={setDuration}
       />
       <StatusBar
         currentTime={currentTime}
+        totalDuration={duration}
         isPlaying={isPlaying}
         onPlay={handlePlay}
         onPause={handlePause}

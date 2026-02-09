@@ -9,7 +9,7 @@ function getVideoSrc() {
   return FALLBACK_VIDEO;
 }
 
-export default function VideoPlayer({ onTimeUpdate, videoRef: externalRef }) {
+export default function VideoPlayer({ onTimeUpdate, onDurationChange, videoRef: externalRef }) {
   const internalRef = useRef(null);
   const ref = externalRef ?? internalRef;
   const [error, setError] = useState(null);
@@ -28,6 +28,13 @@ export default function VideoPlayer({ onTimeUpdate, videoRef: externalRef }) {
     video.addEventListener("timeupdate", handler);
     return () => video.removeEventListener("timeupdate", handler);
   }, [ref, onTimeUpdate]);
+
+  const handleLoadedMetadata = () => {
+    const video = ref.current;
+    if (video && onDurationChange) {
+      onDurationChange(video.duration || 0);
+    }
+  };
 
   const handleError = () => {
     setError(true);
@@ -49,6 +56,7 @@ export default function VideoPlayer({ onTimeUpdate, videoRef: externalRef }) {
         src={videoSrc}
         controls={false}
         playsInline
+        onLoadedMetadata={handleLoadedMetadata}
         onError={handleError}
       >
         Your browser does not support the video tag.
